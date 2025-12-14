@@ -2,7 +2,7 @@
   "name": "gym-desktop-app",
   "version": "1.0.0",
   "description": "Desktop application designed to manage gym operations.",
-  "main": "main.js",
+  "main": "electron/main.js",
   "scripts": {
     "start": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1"
