@@ -1,5 +1,5 @@
 const { app, BrowserWindow } = require('electron');
-const path = require('path');
+
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -7,7 +7,7 @@ function createWindow() {
     height: 800
   });
 
-  win.loadFile(path.join(__dirname, '../renderer/index.html'));
+  win.loadURL('http://localhost:5173');
 }
 
 app.whenReady().then(createWindow);
