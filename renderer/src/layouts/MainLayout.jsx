@@ -2,7 +2,7 @@ import Sidebar from "../components/Sidebar";
 
 export default function MainLayout({ user, onLogout, onNavigate, children }) {
   return (
-    <div className="flex min-h-screen bg-gray-900 text-white">
+    <div className="flex min-h-screen bg-kronnos-dark text-kronnos-text">
       <Sidebar role={user.role} onNavigate={onNavigate} />
 
       <main className="flex-1 p-6">
@@ -11,23 +11,16 @@ export default function MainLayout({ user, onLogout, onNavigate, children }) {
           <h1 className="text-2xl font-bold">Dashboard</h1>
 
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-400">
-              Rol: {user.role}
-            </span>
+            <span className="text-sm text-kronnos-muted">Rol: {user.role}</span>
 
-            <button
-              onClick={onLogout}
-              className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-sm font-semibold transition"
-            >
+            <button onClick={onLogout} className="btn-danger">
               Cerrar sesión
             </button>
           </div>
         </header>
 
         {/* Contenido */}
-        <section className="bg-gray-800 rounded-lg p-6">
-          {children}
-        </section>
+        <section className="card">{children}</section>
       </main>
     </div>
   );

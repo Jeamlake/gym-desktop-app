@@ -1,3 +1,46 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* =========================
+   THEME KRONNOS – COMPONENTES
+   ========================= */
+@layer components {
+
+    /* Botones */
+    .btn-primary {
+        @apply bg-kronnos-gold hover:bg-kronnos-goldHover text-black font-semibold px-4 py-2 rounded transition;
+    }
+
+    .btn-secondary {
+        @apply bg-kronnos-surface hover:bg-gray-600 text-white px-4 py-2 rounded transition;
+    }
+
+    .btn-danger {
+        @apply bg-kronnos-danger hover:bg-red-700 text-white px-4 py-2 rounded transition;
+    }
+
+    /* Cards / contenedores */
+    .card {
+        @apply bg-kronnos-sidebar rounded-lg p-6 shadow-md;
+    }
+
+    /* Inputs */
+    .input {
+        @apply bg-kronnos-surface text-white px-3 py-2 rounded border border-gray-600 focus:outline-none focus:border-kronnos-gold;
+    }
+
+    /* Sidebar item */
+    .sidebar-item {
+        @apply w-full text-left px-3 py-2 rounded hover:bg-kronnos-surface transition;
+    }
+
+    .sidebar-item-active {
+        @apply bg-kronnos-surface border-l-4 border-kronnos-gold;
+    }
+}
+
+/* Base global */
+body {
+    @apply bg-kronnos-dark text-kronnos-text;
+}

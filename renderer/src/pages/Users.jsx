@@ -19,14 +19,7 @@ export default function Users() {
   const handleAddUser = (e) => {
     e.preventDefault();
 
-    setUsers([
-      ...users,
-      {
-        id: Date.now(),
-        ...form,
-      },
-    ]);
-
+    setUsers([...users, { id: Date.now(), ...form }]);
     setForm({ name: "", email: "", role: "RECEPCION" });
   };
 
@@ -35,18 +28,14 @@ export default function Users() {
       <h2 className="text-xl font-bold">Gestión de Usuarios</h2>
 
       {/* Formulario */}
-      <form
-        onSubmit={handleAddUser}
-        className="bg-gray-700 p-4 rounded-lg space-y-4"
-      >
+      <form onSubmit={handleAddUser} className="card space-y-4">
         <div className="grid grid-cols-3 gap-4">
           <input
             name="name"
             placeholder="Nombre"
             value={form.name}
             onChange={handleChange}
-            className="px-3 py-2 rounded bg-gray-800 text-white"
-            required
+            className="input"
           />
 
           <input
@@ -55,15 +44,14 @@ export default function Users() {
             placeholder="Correo"
             value={form.email}
             onChange={handleChange}
-            className="px-3 py-2 rounded bg-gray-800 text-white"
-            required
+            className="input"
           />
 
           <select
             name="role"
             value={form.role}
             onChange={handleChange}
-            className="px-3 py-2 rounded bg-gray-800 text-white"
+            className="input"
           >
             <option value="ADMIN">Administrador</option>
             <option value="RECEPCION">Recepción</option>
@@ -71,18 +59,15 @@ export default function Users() {
           </select>
         </div>
 
-        <button
-          type="submit"
-          className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded font-semibold"
-        >
+        <button type="submit" className="btn-primary">
           Crear usuario
         </button>
       </form>
 
       {/* Tabla */}
-      <div className="bg-gray-800 rounded-lg overflow-hidden">
+      <div className="card overflow-hidden">
         <table className="w-full text-left">
-          <thead className="bg-gray-700">
+          <thead className="bg-kronnos-surface">
             <tr>
               <th className="p-3">Nombre</th>
               <th className="p-3">Correo</th>
@@ -91,7 +76,10 @@ export default function Users() {
           </thead>
           <tbody>
             {users.map((u) => (
-              <tr key={u.id} className="border-t border-gray-700">
+              <tr
+                key={u.id}
+                className="border-t border-kronnos-surface hover:bg-kronnos-surface"
+              >
                 <td className="p-3">{u.name}</td>
                 <td className="p-3">{u.email}</td>
                 <td className="p-3">{u.role}</td>
