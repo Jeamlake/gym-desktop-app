@@ -1,4 +1,5 @@
 import Sidebar from "../components/Sidebar";
+import Dashboard from "../pages/Dashboard";
 
 export default function MainLayout({ user, onLogout, onNavigate, children }) {
   return (

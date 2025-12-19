@@ -1,28 +1,51 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Login from "./pages/Login";
-import MainLayout from "./layouts/MainLayout";
+import Dashboard from "./pages/Dashboard";
 import Users from "./pages/Users";
+import MainLayout from "./layouts/MainLayout";
 
 function App() {
   const [user, setUser] = useState(null);
-  const [view, setView] = useState("dashboard");
+  const [page, setPage] = useState("dashboard");
 
+  // 🔁 Restaurar sesión al iniciar la app
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  // 🚪 Logout real
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);
+    setPage("dashboard");
+  };
+
+  // 🔐 Si no hay usuario → Login
   if (!user) {
     return <Login onLogin={setUser} />;
   }
 
-  let content = <p>Bienvenido al sistema del gimnasio.</p>;
+  // 🔒 Protección por rol
+  let content = null;
 
-  if (user.role === "ADMIN" && view === "users") {
-    content = <Users />;
+  if (page === "dashboard") {
+    content = <Dashboard role={user.role} />;
+  }
+
+  if (page === "users") {
+    if (user.role !== "ADMIN") {
+      content = <div className="card text-red-500">Acceso denegado</div>;
+    } else {
+      content = <Users />;
+    }
   }
 
   return (
-    <MainLayout
-      user={user}
-      onLogout={() => setUser(null)}
-      onNavigate={setView}
-    >
+    <MainLayout user={user} onLogout={handleLogout} onNavigate={setPage}>
       {content}
     </MainLayout>
   );
