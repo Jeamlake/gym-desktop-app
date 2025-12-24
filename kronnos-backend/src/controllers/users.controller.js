@@ -150,3 +150,26 @@ export const resetPassword = async (req, res) => {
     res.status(500).json({ message: "Error al resetear contraseña" });
   }
 };
+
+export const changePassword = async (req, res) => {
+  try {
+    const { password } = req.body;
+
+    if (!password || password.length < 6) {
+      return res.status(400).json({ message: "Contraseña inválida ya que tiene que tener mas de 6 caracteres" });
+    }
+
+    const hash = await bcrypt.hash(password, 10);
+
+    await pool.query(
+      "UPDATE users SET password_hash = ?, must_change_password = 0 WHERE id = ?",
+      [hash, req.user.id]
+    );
+
+    res.json({ message: "Contraseña actualizada" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error al cambiar contraseña" });
+  }
+};
+

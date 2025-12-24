@@ -3,6 +3,8 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Users from "./pages/Users";
 import MainLayout from "./layouts/MainLayout";
+import ChangePassword from "./pages/ChangePassword";
+
 
 function App() {
   const [user, setUser] = useState(null);
@@ -27,6 +29,19 @@ function App() {
   // 🔐 Si no hay usuario → Login
   if (!user) {
     return <Login onLogin={setUser} />;
+  }
+
+  // 🔐 Cambio de contraseña obligatorio
+  if (user.mustChangePassword) {
+    return (
+      <ChangePassword
+        onSuccess={() => {
+          const updatedUser = { ...user, mustChangePassword: false };
+          localStorage.setItem("user", JSON.stringify(updatedUser));
+          setUser(updatedUser);
+        }}
+      />
+    );
   }
 
   // 🔒 Protección por rol

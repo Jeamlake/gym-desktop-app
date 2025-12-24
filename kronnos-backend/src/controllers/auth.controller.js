@@ -38,8 +38,10 @@ export const login = async (req, res) => {
         id: user.id,
         username: user.username,
         role: user.role,
+        mustChangePassword: user.must_change_password === 1,
       },
     });
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error interno del servidor" });
