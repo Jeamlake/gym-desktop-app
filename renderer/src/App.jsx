@@ -1,24 +1,31 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Users from "./pages/Users";
-import MainLayout from "./layouts/MainLayout";
 import ChangePassword from "./pages/ChangePassword";
+import MainLayout from "./layouts/MainLayout";
+import Promotions from "./pages/Promotions";
+import Memberships from "./pages/Memberships";
+import Payments from "./pages/Payments";
+import Attendance from "./pages/Attendance";
+import Members from "./pages/Members";
 
+const PagePlaceholder = ({ title }) => (
+  <div className="text-gray-300">
+    <h2 className="text-lg font-semibold mb-2">{title}</h2>
+    <p className="text-sm text-gray-400">En construcción.</p>
+  </div>
+);
 
 function App() {
   const [user, setUser] = useState(null);
   const [page, setPage] = useState("dashboard");
 
-  // 🔁 Restaurar sesión al iniciar la app
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
+    if (storedUser) setUser(JSON.parse(storedUser));
   }, []);
 
-  // 🚪 Logout real
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -26,12 +33,56 @@ function App() {
     setPage("dashboard");
   };
 
-  // 🔐 Si no hay usuario → Login
-  if (!user) {
-    return <Login onLogin={setUser} />;
-  }
+  // 👇 SIEMPRE se ejecuta
+  const ROUTES = useMemo(
+    () => ({
+      dashboard: {
+        title: "Dashboard",
+        roles: ["ADMIN", "RECEPCION", "ENTRENADOR"],
+        element: <Dashboard />,
+      },
+      users: {
+        title: "Usuarios",
+        roles: ["ADMIN"],
+        element: <Users />,
+      },
+      promotions: {
+        title: "Promociones",
+        roles: ["ADMIN"],
+        element: <Promotions />,
+      },
+      members: {
+        title: "Socios",
+        roles: ["ADMIN", "RECEPCION"],
+        element: <Members />,
+      },
+      memberships: {
+        title: "Membresías",
+        roles: ["ADMIN", "RECEPCION"],
+        element: <Memberships />,
+      },
+      payments: {
+        title: "Pagos",
+        roles: ["ADMIN", "RECEPCION"],
+        element: <Payments />,
+      },
+      attendance: {
+        title: "Asistencia",
+        roles: ["ADMIN", "RECEPCION"],
+        element: <Attendance />,
+      },
+      "trainer-members": {
+        title: "Mis Socios",
+        roles: ["ENTRENADOR", "ADMIN"],
+        element: <PagePlaceholder title="Mis Socios" />,
+      },
+    }),
+    []
+  );
 
-  // 🔐 Cambio de contraseña obligatorio
+  // 👇 AHORA SÍ returns condicionales
+  if (!user) return <Login onLogin={setUser} />;
+
   if (user.mustChangePassword) {
     return (
       <ChangePassword
@@ -44,24 +95,22 @@ function App() {
     );
   }
 
-  // 🔒 Protección por rol
-  let content = null;
-
-  if (page === "dashboard") {
-    content = <Dashboard role={user.role} />;
-  }
-
-  if (page === "users") {
-    if (user.role !== "ADMIN") {
-      content = <div className="card text-red-500">Acceso denegado</div>;
-    } else {
-      content = <Users />;
-    }
-  }
+  const route = ROUTES[page] || ROUTES.dashboard;
+  const allowed = route.roles.includes(user.role);
 
   return (
-    <MainLayout user={user} onLogout={handleLogout} onNavigate={setPage}>
-      {content}
+    <MainLayout
+      user={user}
+      onLogout={handleLogout}
+      onNavigate={setPage}
+      currentPage={page}
+      title={route.title}
+    >
+      {allowed ? (
+        React.cloneElement(route.element, { user })
+      ) : (
+        <div className="text-red-500 font-semibold">Acceso denegado</div>
+      )}
     </MainLayout>
   );
 }

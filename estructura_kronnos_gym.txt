@@ -5,6 +5,8 @@ D:.
 |   backend.txt
 |   estructura_kronnos_gym.txt
 |   kronnos_gym_2025-12-24.sql
+|   kronnos_gym_2025-12-25.sql
+|   kronnos_gym_2025-12-26.sql
 |   kronnos_gym_dump.sql
 |   package-lock.json
 |   package.json
@@ -5043,6 +5045,172 @@ D:.
 |   |   |           conversion.js
 |   |   |           README.md
 |   |   |           
+|   |   +---node-cron
+|   |   |   |   LICENSE.md
+|   |   |   |   package.json
+|   |   |   |   README.md
+|   |   |   |   
+|   |   |   \---dist
+|   |   |       +---cjs
+|   |   |       |   |   create-id.d.ts
+|   |   |       |   |   create-id.js
+|   |   |       |   |   create-id.js.map
+|   |   |       |   |   logger.d.ts
+|   |   |       |   |   logger.js
+|   |   |       |   |   logger.js.map
+|   |   |       |   |   node-cron.d.ts
+|   |   |       |   |   node-cron.js
+|   |   |       |   |   node-cron.js.map
+|   |   |       |   |   task-registry.d.ts
+|   |   |       |   |   task-registry.js
+|   |   |       |   |   task-registry.js.map
+|   |   |       |   |   
+|   |   |       |   +---pattern
+|   |   |       |   |   +---convertion
+|   |   |       |   |   |       asterisk-to-range-conversion.d.ts
+|   |   |       |   |   |       asterisk-to-range-conversion.js
+|   |   |       |   |   |       asterisk-to-range-conversion.js.map
+|   |   |       |   |   |       index.d.ts
+|   |   |       |   |   |       index.js
+|   |   |       |   |   |       index.js.map
+|   |   |       |   |   |       month-names-conversion.d.ts
+|   |   |       |   |   |       month-names-conversion.js
+|   |   |       |   |   |       month-names-conversion.js.map
+|   |   |       |   |   |       range-conversion.d.ts
+|   |   |       |   |   |       range-conversion.js
+|   |   |       |   |   |       range-conversion.js.map
+|   |   |       |   |   |       week-day-names-conversion.d.ts
+|   |   |       |   |   |       week-day-names-conversion.js
+|   |   |       |   |   |       week-day-names-conversion.js.map
+|   |   |       |   |   |       
+|   |   |       |   |   \---validation
+|   |   |       |   |           pattern-validation.d.ts
+|   |   |       |   |           pattern-validation.js
+|   |   |       |   |           pattern-validation.js.map
+|   |   |       |   |           
+|   |   |       |   +---promise
+|   |   |       |   |       tracked-promise.d.ts
+|   |   |       |   |       tracked-promise.js
+|   |   |       |   |       tracked-promise.js.map
+|   |   |       |   |       
+|   |   |       |   +---scheduler
+|   |   |       |   |       runner.d.ts
+|   |   |       |   |       runner.js
+|   |   |       |   |       runner.js.map
+|   |   |       |   |       
+|   |   |       |   +---tasks
+|   |   |       |   |   |   inline-scheduled-task.d.ts
+|   |   |       |   |   |   inline-scheduled-task.js
+|   |   |       |   |   |   inline-scheduled-task.js.map
+|   |   |       |   |   |   scheduled-task.d.ts
+|   |   |       |   |   |   scheduled-task.js
+|   |   |       |   |   |   scheduled-task.js.map
+|   |   |       |   |   |   state-machine.d.ts
+|   |   |       |   |   |   state-machine.js
+|   |   |       |   |   |   state-machine.js.map
+|   |   |       |   |   |   
+|   |   |       |   |   \---background-scheduled-task
+|   |   |       |   |           background-scheduled-task.d.ts
+|   |   |       |   |           background-scheduled-task.js
+|   |   |       |   |           background-scheduled-task.js.map
+|   |   |       |   |           daemon.d.ts
+|   |   |       |   |           daemon.js
+|   |   |       |   |           daemon.js.map
+|   |   |       |   |           index.d.ts
+|   |   |       |   |           index.js
+|   |   |       |   |           index.js.map
+|   |   |       |   |           
+|   |   |       |   \---time
+|   |   |       |           localized-time.d.ts
+|   |   |       |           localized-time.js
+|   |   |       |           localized-time.js.map
+|   |   |       |           matcher-walker.d.ts
+|   |   |       |           matcher-walker.js
+|   |   |       |           matcher-walker.js.map
+|   |   |       |           time-matcher.d.ts
+|   |   |       |           time-matcher.js
+|   |   |       |           time-matcher.js.map
+|   |   |       |           
+|   |   |       \---esm
+|   |   |           |   create-id.d.ts
+|   |   |           |   create-id.js
+|   |   |           |   create-id.js.map
+|   |   |           |   logger.d.ts
+|   |   |           |   logger.js
+|   |   |           |   logger.js.map
+|   |   |           |   node-cron.d.ts
+|   |   |           |   node-cron.js
+|   |   |           |   node-cron.js.map
+|   |   |           |   task-registry.d.ts
+|   |   |           |   task-registry.js
+|   |   |           |   task-registry.js.map
+|   |   |           |   
+|   |   |           +---pattern
+|   |   |           |   +---convertion
+|   |   |           |   |       asterisk-to-range-conversion.d.ts
+|   |   |           |   |       asterisk-to-range-conversion.js
+|   |   |           |   |       asterisk-to-range-conversion.js.map
+|   |   |           |   |       index.d.ts
+|   |   |           |   |       index.js
+|   |   |           |   |       index.js.map
+|   |   |           |   |       month-names-conversion.d.ts
+|   |   |           |   |       month-names-conversion.js
+|   |   |           |   |       month-names-conversion.js.map
+|   |   |           |   |       range-conversion.d.ts
+|   |   |           |   |       range-conversion.js
+|   |   |           |   |       range-conversion.js.map
+|   |   |           |   |       week-day-names-conversion.d.ts
+|   |   |           |   |       week-day-names-conversion.js
+|   |   |           |   |       week-day-names-conversion.js.map
+|   |   |           |   |       
+|   |   |           |   \---validation
+|   |   |           |           pattern-validation.d.ts
+|   |   |           |           pattern-validation.js
+|   |   |           |           pattern-validation.js.map
+|   |   |           |           
+|   |   |           +---promise
+|   |   |           |       tracked-promise.d.ts
+|   |   |           |       tracked-promise.js
+|   |   |           |       tracked-promise.js.map
+|   |   |           |       
+|   |   |           +---scheduler
+|   |   |           |       runner.d.ts
+|   |   |           |       runner.js
+|   |   |           |       runner.js.map
+|   |   |           |       
+|   |   |           +---tasks
+|   |   |           |   |   inline-scheduled-task.d.ts
+|   |   |           |   |   inline-scheduled-task.js
+|   |   |           |   |   inline-scheduled-task.js.map
+|   |   |           |   |   scheduled-task.d.ts
+|   |   |           |   |   scheduled-task.js
+|   |   |           |   |   scheduled-task.js.map
+|   |   |           |   |   state-machine.d.ts
+|   |   |           |   |   state-machine.js
+|   |   |           |   |   state-machine.js.map
+|   |   |           |   |   
+|   |   |           |   \---background-scheduled-task
+|   |   |           |           background-scheduled-task.d.ts
+|   |   |           |           background-scheduled-task.js
+|   |   |           |           background-scheduled-task.js.map
+|   |   |           |           daemon.d.ts
+|   |   |           |           daemon.js
+|   |   |           |           daemon.js.map
+|   |   |           |           index.d.ts
+|   |   |           |           index.js
+|   |   |           |           index.js.map
+|   |   |           |           
+|   |   |           \---time
+|   |   |                   localized-time.d.ts
+|   |   |                   localized-time.js
+|   |   |                   localized-time.js.map
+|   |   |                   matcher-walker.d.ts
+|   |   |                   matcher-walker.js
+|   |   |                   matcher-walker.js.map
+|   |   |                   time-matcher.d.ts
+|   |   |                   time-matcher.js
+|   |   |                   time-matcher.js.map
+|   |   |                   
 |   |   +---node-gyp-build
 |   |   |       bin.js
 |   |   |       build-test.js
@@ -5645,14 +5813,27 @@ D:.
 |       |       db.js
 |       |       
 |       +---controllers
+|       |       attendance.controller.js
 |       |       auth.controller.js
+|       |       members.controller.js
+|       |       memberships.controller.js
+|       |       payments.controller.js
+|       |       promotions.controller.js
 |       |       users.controller.js
+|       |       
+|       +---jobs
+|       |       expireMemberships.js
 |       |       
 |       +---middleware
 |       |       auth.middleware.js
 |       |       
 |       \---routes
+|               attendance.routes.js
 |               auth.routes.js
+|               members.routes.js
+|               memberships.routes.js
+|               payments.routes.js
+|               promotions.routes.js
 |               test.routes.js
 |               users.routes.js
 |               
@@ -17714,10 +17895,21 @@ D:.
         |       MainLayout.jsx
         |       
         +---pages
+        |       Attendance.jsx
+        |       ChangePassword.jsx
         |       Dashboard.jsx
         |       Login.jsx
+        |       Members.jsx
+        |       Memberships.jsx
+        |       Payments.jsx
+        |       Promotions.jsx
         |       Users.jsx
         |       
         \---services
+                attendanceService.js
                 authService.js
+                membershipsService.js
+                membersService.js
+                paymentsService.js
+                promotionsService.js
                 

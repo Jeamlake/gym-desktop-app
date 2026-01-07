@@ -30,11 +30,11 @@ CREATE TABLE `attendance` (
   `recorded_by` int DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `member_id` (`member_id`,`date`),
-  KEY `recorded_by` (`recorded_by`),
-  CONSTRAINT `attendance_ibfk_1` FOREIGN KEY (`member_id`) REFERENCES `members` (`id`),
-  CONSTRAINT `attendance_ibfk_2` FOREIGN KEY (`recorded_by`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  UNIQUE KEY `uq_member_date` (`member_id`,`date`),
+  KEY `fk_attendance_user` (`recorded_by`),
+  CONSTRAINT `fk_attendance_member` FOREIGN KEY (`member_id`) REFERENCES `members` (`id`),
+  CONSTRAINT `fk_attendance_user` FOREIGN KEY (`recorded_by`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -43,6 +43,7 @@ CREATE TABLE `attendance` (
 
 LOCK TABLES `attendance` WRITE;
 /*!40000 ALTER TABLE `attendance` DISABLE KEYS */;
+INSERT INTO `attendance` VALUES (1,2,'2026-01-05',1,1,'2026-01-05 18:14:41');
 /*!40000 ALTER TABLE `attendance` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -62,10 +63,10 @@ CREATE TABLE `inventory_movements` (
   `created_by` int DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `product_id` (`product_id`),
-  KEY `created_by` (`created_by`),
-  CONSTRAINT `inventory_movements_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`),
-  CONSTRAINT `inventory_movements_ibfk_2` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`)
+  KEY `fk_inventory_product` (`product_id`),
+  KEY `fk_inventory_user` (`created_by`),
+  CONSTRAINT `fk_inventory_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`),
+  CONSTRAINT `fk_inventory_user` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -96,9 +97,10 @@ CREATE TABLE `members` (
   `created_by` int DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `created_by` (`created_by`),
-  CONSTRAINT `members_ibfk_1` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  UNIQUE KEY `dni` (`dni`),
+  KEY `fk_members_created_by` (`created_by`),
+  CONSTRAINT `fk_members_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -107,7 +109,48 @@ CREATE TABLE `members` (
 
 LOCK TABLES `members` WRITE;
 /*!40000 ALTER TABLE `members` DISABLE KEYS */;
+INSERT INTO `members` VALUES (1,'edu','alvar','73645321','los postes','923645672','2003-07-14',1,'2026-01-02 16:09:20'),(2,'samy','salda','72734821','caada','923647321','2003-05-25',1,'2026-01-03 05:03:18'),(3,'benja','does','72739281','banxes','927382712','2003-07-13',1,'2026-01-05 09:07:10');
 /*!40000 ALTER TABLE `members` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `memberships`
+--
+
+DROP TABLE IF EXISTS `memberships`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `memberships` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `member_id` int NOT NULL,
+  `promotion_id` int NOT NULL,
+  `payment_id` int NOT NULL,
+  `fecha_inicio` date NOT NULL,
+  `fecha_fin` date NOT NULL,
+  `estado` enum('ACTIVA','VENCIDA','SUSPENDIDA') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ACTIVA',
+  `created_by` int NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `evento` enum('CREACION','RENOVACION') COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_membership_payment` (`payment_id`),
+  KEY `fk_memberships_promotion` (`promotion_id`),
+  KEY `fk_memberships_created_by` (`created_by`),
+  KEY `idx_membership_member_estado` (`member_id`,`estado`),
+  CONSTRAINT `fk_memberships_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`),
+  CONSTRAINT `fk_memberships_member` FOREIGN KEY (`member_id`) REFERENCES `members` (`id`),
+  CONSTRAINT `fk_memberships_payment` FOREIGN KEY (`payment_id`) REFERENCES `payments` (`id`),
+  CONSTRAINT `fk_memberships_promotion` FOREIGN KEY (`promotion_id`) REFERENCES `promotions` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `memberships`
+--
+
+LOCK TABLES `memberships` WRITE;
+/*!40000 ALTER TABLE `memberships` DISABLE KEYS */;
+INSERT INTO `memberships` VALUES (1,1,1,1,'2026-01-02','2026-01-31','ACTIVA',1,'2026-01-02 16:11:26','CREACION'),(2,2,1,2,'2026-01-06','2026-02-04','VENCIDA',1,'2026-01-05 03:20:53','CREACION'),(3,2,1,3,'2026-02-04','2026-03-05','ACTIVA',1,'2026-01-05 03:22:58','RENOVACION');
+/*!40000 ALTER TABLE `memberships` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -126,10 +169,10 @@ CREATE TABLE `nutrition_plans` (
   `fecha` date DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `member_id` (`member_id`),
-  KEY `trainer_id` (`trainer_id`),
-  CONSTRAINT `nutrition_plans_ibfk_1` FOREIGN KEY (`member_id`) REFERENCES `members` (`id`),
-  CONSTRAINT `nutrition_plans_ibfk_2` FOREIGN KEY (`trainer_id`) REFERENCES `users` (`id`)
+  KEY `fk_nutrition_member` (`member_id`),
+  KEY `fk_nutrition_trainer` (`trainer_id`),
+  CONSTRAINT `fk_nutrition_member` FOREIGN KEY (`member_id`) REFERENCES `members` (`id`),
+  CONSTRAINT `fk_nutrition_trainer` FOREIGN KEY (`trainer_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -158,11 +201,11 @@ CREATE TABLE `payments` (
   `created_by` int DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `member_id` (`member_id`),
-  KEY `created_by` (`created_by`),
-  CONSTRAINT `payments_ibfk_1` FOREIGN KEY (`member_id`) REFERENCES `members` (`id`),
-  CONSTRAINT `payments_ibfk_2` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `fk_payments_member` (`member_id`),
+  KEY `fk_payments_created_by` (`created_by`),
+  CONSTRAINT `fk_payments_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`),
+  CONSTRAINT `fk_payments_member` FOREIGN KEY (`member_id`) REFERENCES `members` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -171,6 +214,7 @@ CREATE TABLE `payments` (
 
 LOCK TABLES `payments` WRITE;
 /*!40000 ALTER TABLE `payments` DISABLE KEYS */;
+INSERT INTO `payments` VALUES (1,1,99.00,'Enero 2026 02','EFECTIVO',1,'2026-01-02 16:10:46'),(2,2,99.00,'Enero','YAPE',1,'2026-01-03 05:03:50'),(3,2,99.00,'enero','YAPE',1,'2026-01-05 03:22:10'),(4,3,99.00,'enero','YAPE',1,'2026-01-05 09:07:22');
 /*!40000 ALTER TABLE `payments` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -204,6 +248,37 @@ LOCK TABLES `products` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `promotions`
+--
+
+DROP TABLE IF EXISTS `promotions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `promotions` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `duracion_dias` int NOT NULL,
+  `precio` decimal(10,2) NOT NULL,
+  `requiere_documento` tinyint(1) DEFAULT '0',
+  `tipo_documento` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `descripcion` text COLLATE utf8mb4_unicode_ci,
+  `active` tinyint(1) DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `promotions`
+--
+
+LOCK TABLES `promotions` WRITE;
+/*!40000 ALTER TABLE `promotions` DISABLE KEYS */;
+INSERT INTO `promotions` VALUES (1,'Verano',30,99.00,0,NULL,'Promoción verano de 1 mes',1,'2026-01-02 16:10:06');
+/*!40000 ALTER TABLE `promotions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `sale_items`
 --
 
@@ -217,10 +292,10 @@ CREATE TABLE `sale_items` (
   `cantidad` int NOT NULL,
   `precio_unitario` decimal(10,2) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `sale_id` (`sale_id`),
-  KEY `product_id` (`product_id`),
-  CONSTRAINT `sale_items_ibfk_1` FOREIGN KEY (`sale_id`) REFERENCES `sales` (`id`),
-  CONSTRAINT `sale_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)
+  KEY `fk_sale_item_sale` (`sale_id`),
+  KEY `fk_sale_item_product` (`product_id`),
+  CONSTRAINT `fk_sale_item_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`),
+  CONSTRAINT `fk_sale_item_sale` FOREIGN KEY (`sale_id`) REFERENCES `sales` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -246,8 +321,8 @@ CREATE TABLE `sales` (
   `total` decimal(10,2) NOT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `sold_by` (`sold_by`),
-  CONSTRAINT `sales_ibfk_1` FOREIGN KEY (`sold_by`) REFERENCES `users` (`id`)
+  KEY `fk_sales_user` (`sold_by`),
+  CONSTRAINT `fk_sales_user` FOREIGN KEY (`sold_by`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -277,8 +352,8 @@ CREATE TABLE `training_program_items` (
   `repeticiones` int DEFAULT NULL,
   `peso` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `program_id` (`program_id`),
-  CONSTRAINT `training_program_items_ibfk_1` FOREIGN KEY (`program_id`) REFERENCES `training_programs` (`id`)
+  KEY `fk_training_item_program` (`program_id`),
+  CONSTRAINT `fk_training_item_program` FOREIGN KEY (`program_id`) REFERENCES `training_programs` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -309,10 +384,10 @@ CREATE TABLE `training_programs` (
   `active` tinyint(1) DEFAULT '1',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `member_id` (`member_id`),
-  KEY `trainer_id` (`trainer_id`),
-  CONSTRAINT `training_programs_ibfk_1` FOREIGN KEY (`member_id`) REFERENCES `members` (`id`),
-  CONSTRAINT `training_programs_ibfk_2` FOREIGN KEY (`trainer_id`) REFERENCES `users` (`id`)
+  KEY `fk_training_member` (`member_id`),
+  KEY `fk_training_trainer` (`trainer_id`),
+  CONSTRAINT `fk_training_member` FOREIGN KEY (`member_id`) REFERENCES `members` (`id`),
+  CONSTRAINT `fk_training_trainer` FOREIGN KEY (`trainer_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -339,11 +414,12 @@ CREATE TABLE `users` (
   `password_hash` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `role` enum('ADMIN','RECEPCION','ENTRENADOR') COLLATE utf8mb4_unicode_ci NOT NULL,
   `active` tinyint(1) DEFAULT '1',
+  `must_change_password` tinyint(1) DEFAULT '0',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -352,7 +428,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'admin','admin@kronnos.com','$2b$10$xNNcEzsaSOX36JFLpPGhqeVRiDzhy1MCf4ay0E2e0NGXKHEwmN.ii','ADMIN',1,'2025-12-17 19:16:44');
+INSERT INTO `users` VALUES (1,'admin','admin@kronnos.com','$2b$10$rYxMQ11PHg7/0xQNqdwMNeOyGa1vAeIGPqvjxX9dMM.od3ogCCXmq','ADMIN',1,0,'2026-01-01 19:07:16'),(2,'Judy','jmejia@kronnos.com','$2b$10$fJK79qo22ytsbokZp.XhJ.B1oRb5hhP75jHw3KLNI8DG9Lz20QPzS','RECEPCION',1,0,'2026-01-02 16:30:13');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -365,4 +441,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-19  4:25:41
+-- Dump completed on 2026-01-07  9:29:17

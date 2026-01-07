@@ -1,4 +1,8 @@
-export default function Dashboard({ role }) {
+// Dashboard.jsx
+
+export default function Dashboard({ user }) {
+  const role = user?.role;
+
   return (
     <div className="space-y-6">
       {/* ===== HEADER ===== */}
@@ -51,7 +55,7 @@ export default function Dashboard({ role }) {
         </div>
       </div>
 
-      {/* ===== WELCOME / INFO ===== */}
+      {/* ===== WELCOME ===== */}
       <div className="card">
         <h3 className="text-lg font-semibold text-white mb-2">
           Bienvenido al sistema KRONNOS GYM

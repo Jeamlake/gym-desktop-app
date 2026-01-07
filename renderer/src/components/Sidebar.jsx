@@ -1,20 +1,62 @@
-import { useState } from "react";
 import logo from "../assets/Kronnos_gym_logo.png";
 
-export default function Sidebar({ role, onNavigate }) {
-  const [active, setActive] = useState("dashboard");
+const MENU = [
+  {
+    section: "General",
+    items: [
+      {
+        label: "Dashboard",
+        route: "dashboard",
+        roles: ["ADMIN", "RECEPCION", "ENTRENADOR"],
+      },
+    ],
+  },
+  {
+    section: "Administración",
+    items: [
+      { label: "Usuarios", route: "users", roles: ["ADMIN"] },
+      { label: "Promociones", route: "promotions", roles: ["ADMIN"] },
+      { label: "Reportes", route: "reports", roles: ["ADMIN"] },
+      // más adelante: Inventario, Productos, Ventas...
+    ],
+  },
+  {
+    section: "Recepción",
+    items: [
+      { label: "Socios", route: "members", roles: ["ADMIN", "RECEPCION"] },
+      { label: "Pagos", route: "payments", roles: ["ADMIN", "RECEPCION"] },
+      {
+        label: "Membresías",
+        route: "memberships",
+        roles: ["ADMIN", "RECEPCION"],
+      },
+      {
+        label: "Asistencia",
+        route: "attendance",
+        roles: ["ADMIN", "RECEPCION"],
+      },
+    ],
+  },
+  {
+    section: "Entrenador",
+    items: [
+      {
+        label: "Mis Socios",
+        route: "trainer-members",
+        roles: ["ENTRENADOR", "ADMIN"],
+      },
+    ],
+  },
+];
 
-  const handleNavigate = (route) => {
-    setActive(route);
-    onNavigate(route);
-  };
-
+export default function Sidebar({ role, currentPage, onNavigate }) {
   const navButton = (label, route) => (
     <button
-      onClick={() => handleNavigate(route)}
+      key={route}
+      onClick={() => onNavigate(route)}
       className={`relative w-full text-left px-4 py-2 rounded transition flex items-center
         ${
-          active === route
+          currentPage === route
             ? "bg-kronnos-gold text-black font-semibold before:absolute before:left-0 before:top-0 before:h-full before:w-1 before:bg-black"
             : "text-gray-300 hover:bg-white/10"
         }`}
@@ -22,6 +64,8 @@ export default function Sidebar({ role, onNavigate }) {
       {label}
     </button>
   );
+
+  const canSee = (item) => item.roles.includes(role);
 
   return (
     <aside className="w-64 min-h-screen bg-kronnos-sidebar text-white flex flex-col">
@@ -38,43 +82,20 @@ export default function Sidebar({ role, onNavigate }) {
 
       {/* ===== NAV ===== */}
       <nav className="flex-1 px-3 py-4 space-y-1">
-        {/* GENERAL */}
-        <p className="px-4 text-xs uppercase tracking-wider text-gray-500 mb-2">
-          General
-        </p>
-        {navButton("Dashboard", "dashboard")}
+        {MENU.map((group) => {
+          const visibleItems = group.items.filter(canSee);
+          if (visibleItems.length === 0) return null;
 
-        {/* ADMIN */}
-        {role === "ADMIN" && (
-          <>
-            <p className="px-4 mt-6 text-xs uppercase tracking-wider text-gray-500 mb-2">
-              Administración
-            </p>
-            {navButton("Usuarios", "users")}
-            {navButton("Reportes", "reports")}
-          </>
-        )}
-
-        {/* RECEPCIÓN */}
-        {role === "RECEPCION" && (
-          <>
-            <p className="px-4 mt-6 text-xs uppercase tracking-wider text-gray-500 mb-2">
-              Recepción
-            </p>
-            {navButton("Socios", "socios")}
-            {navButton("Pagos", "pagos")}
-          </>
-        )}
-
-        {/* ENTRENADOR */}
-        {role === "ENTRENADOR" && (
-          <>
-            <p className="px-4 mt-6 text-xs uppercase tracking-wider text-gray-500 mb-2">
-              Entrenador
-            </p>
-            {navButton("Mis Socios", "mis-socios")}
-          </>
-        )}
+          return (
+            <div key={group.section}>
+              <p className="px-4 text-xs uppercase tracking-wider text-gray-500 mb-2">
+                {group.section}
+              </p>
+              {visibleItems.map((i) => navButton(i.label, i.route))}
+              <div className="h-4" />
+            </div>
+          );
+        })}
       </nav>
 
       {/* ===== FOOTER ===== */}
