@@ -1,4 +1,4 @@
-import { pool } from "../config/db.js";
+import db from "../config/db.js";
 
 /**
  * 🔒 Lógica central para crear membresía con pago
@@ -12,7 +12,7 @@ const createMembershipInternal = async ({
   evento = "CREACION",
 }) => {
   // 1️⃣ Validar pago
-  const [pay] = await pool.query(
+  const [pay] = await db.query(
     "SELECT id FROM payments WHERE id = ? AND member_id = ?",
     [payment_id, member_id]
   );
@@ -22,7 +22,7 @@ const createMembershipInternal = async ({
   }
 
   // 2️⃣ Validar pago no usado
-  const [used] = await pool.query(
+  const [used] = await db.query(
     "SELECT id FROM memberships WHERE payment_id = ?",
     [payment_id]
   );
@@ -32,7 +32,7 @@ const createMembershipInternal = async ({
   }
 
   // 3️⃣ Validar promoción
-  const [promo] = await pool.query(
+  const [promo] = await db.query(
     "SELECT duracion_dias FROM promotions WHERE id = ? AND active = 1",
     [promotion_id]
   );
@@ -50,7 +50,7 @@ const createMembershipInternal = async ({
   fechaFin.setSeconds(fechaFin.getSeconds() - 1); // 23:59:59 del día anterior
 
   // 5️⃣ Insertar membresía
-  const [result] = await pool.query(
+  const [result] = await db.query(
     `INSERT INTO memberships
 (member_id, promotion_id, payment_id, fecha_inicio, fecha_fin, estado, evento, created_by)
 VALUES (?, ?, ?, ?, ?, 'ACTIVA', ?, ?)`,
@@ -75,7 +75,7 @@ export const createMembership = async (req, res) => {
 
   try {
     // ❗ No permitir doble activa
-    const [active] = await pool.query(
+    const [active] = await db.query(
       "SELECT id FROM memberships WHERE member_id = ? AND estado = 'ACTIVA'",
       [member_id]
     );
@@ -104,7 +104,7 @@ export const createMembership = async (req, res) => {
 // ✅ Listar membresías
 export const getMemberships = async (req, res) => {
   try {
-    const [rows] = await pool.query(`
+    const [rows] = await db.query(`
       SELECT 
         m.id,
         mem.id AS member_id,
@@ -137,8 +137,8 @@ export const renewMembership = async (req, res) => {
   const userId = req.user.id;
 
   try {
-    // ❗ Verificar que exista una membresía previa
-    const [prev] = await pool.query(
+    // 1️⃣ Verificar que tenga alguna membresía previa
+    const [prev] = await db.query(
       "SELECT id FROM memberships WHERE member_id = ?",
       [member_id]
     );
@@ -148,12 +148,6 @@ export const renewMembership = async (req, res) => {
         message: "No se puede renovar: el socio no tiene membresías previas",
       });
     }
-
-    // 1️⃣ Vencer activa
-    await pool.query(
-      "UPDATE memberships SET estado = 'VENCIDA' WHERE member_id = ? AND estado = 'ACTIVA'",
-      [member_id]
-    );
 
     const id = await createMembershipInternal({
       member_id,
@@ -177,7 +171,7 @@ export const renewMembership = async (req, res) => {
 // GET /memberships/summary
 export const getMembershipsSummary = async (req, res) => {
   try {
-    const [rows] = await pool.query(`
+    const [rows] = await db.query(`
       SELECT 
         m.id,
         mem.id AS member_id,
@@ -210,7 +204,7 @@ export const getMembershipHistory = async (req, res) => {
   const { memberId } = req.params;
 
   try {
-    const [rows] = await pool.query(
+    const [rows] = await db.query(
       `
       SELECT 
   m.id,

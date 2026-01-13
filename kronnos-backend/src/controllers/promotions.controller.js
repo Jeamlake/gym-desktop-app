@@ -1,4 +1,4 @@
-import { pool } from "../config/db.js";
+import db from "../config/db.js";
 
 /**
  * GET /api/promotions
@@ -6,7 +6,7 @@ import { pool } from "../config/db.js";
  */
 export const getPromotions = async (req, res) => {
   try {
-    const [rows] = await pool.query(
+    const [rows] = await db.query(
       "SELECT * FROM promotions WHERE active = 1 ORDER BY created_at DESC"
     );
     res.json(rows);
@@ -35,7 +35,7 @@ export const createPromotion = async (req, res) => {
       return res.status(400).json({ message: "Datos obligatorios faltantes" });
     }
 
-    await pool.query(
+    await db.query(
       `INSERT INTO promotions
         (nombre, duracion_dias, precio, requiere_documento, tipo_documento, descripcion)
        VALUES (?, ?, ?, ?, ?, ?)`,
@@ -64,7 +64,7 @@ export const togglePromotion = async (req, res) => {
   try {
     const { id } = req.params;
 
-    await pool.query("UPDATE promotions SET active = NOT active WHERE id = ?", [
+    await db.query("UPDATE promotions SET active = NOT active WHERE id = ?", [
       id,
     ]);
 

@@ -1,0 +1,170 @@
+
+Voy a dictarte el contenido completo de las tres carpetas clave de tu app de escritorio Kronnos Gym, tal como están en tu TXT, ignorando node_modules.
+
+📁 1️⃣ electron/
+electron/
+└─ main.js
+
+
+Resumen mental
+
+Solo existe un archivo
+
+main.js es el proceso principal de Electron
+
+Crea la ventana y carga el frontend (renderer)
+
+No hay preload, no hay IPC adicional (por ahora)
+
+📁 2️⃣ kronnos-backend/
+
+(ignorando node_modules)
+
+kronnos-backend/
+├─ .env
+├─ generate-hash.js
+├─ package-lock.json
+├─ package.json
+├─ server.js
+└─ src/
+   ├─ app.js
+   ├─ config/
+   │  └─ db.js
+   ├─ controllers/
+   │  ├─ attendance.controller.js
+   │  ├─ auth.controller.js
+   │  ├─ credit.controller.js
+   │  ├─ members.controller.js
+   │  ├─ memberships.controller.js
+   │  ├─ payments.controller.js
+   │  ├─ products.controller.js
+   │  ├─ promotions.controller.js
+   │  ├─ sales.controller.js
+   │  └─ users.controller.js
+   ├─ jobs/
+   │  ├─  expireMemberships.js
+   │  └─  membeershipStatus.job.js
+   ├─ middleware/
+   │  └─ auth.middleware.js
+   └─ routes/
+      ├─ attendance.routes.js
+      ├─ auth.routes.js
+      ├─ credit.routes.js
+      ├─ members.routes.js
+      ├─ memberships.routes.js
+      ├─ payments.routes.js
+      ├─ products.routes.js
+      ├─ promotions.routes.js
+      ├─ sales.routes.js
+      ├─ test.routes.js
+      └─ users.routes.js
+
+
+Resumen mental
+
+Backend Node + Express
+
+server.js → arranque
+
+src/app.js → configuración central
+
+Arquitectura clásica:
+
+controllers → lógica
+
+routes → endpoints
+
+middleware → JWT / auth
+
+jobs → tareas automáticas
+
+config/db.js → MySQL
+
+📁 3️⃣ renderer/
+
+(ignorando node_modules)
+
+renderer/
+├─ .gitignore
+├─ eslint.config.js
+├─ index.html
+├─ package-lock.json
+├─ package.json
+├─ postcss.config.js
+├─ README.md
+├─ tailwind.config.js
+├─ vite.config.js
+├─ public/
+│  └─ vite.svg
+└─ src/
+   ├─ App.css
+   ├─ App.jsx
+   ├─ index.css
+   ├─ main.jsx
+   ├─ assets/
+   │  ├─ Kronnos_gym_logo.png
+   │  └─ react.svg
+   ├─ components/
+   │  ├─ AttendanceCalendar.jsx
+   │  ├─ MembershipHistoryCalendar.jsx
+   │  └─ Sidebar.jsx
+   ├─ layouts/
+   │  └─ MainLayout.jsx
+   ├─ pages/
+   │  ├─ ChangePassword.jsx
+   │  ├─ Dashboard.jsx
+   │  ├─ Login.jsx
+   │  ├─ Members.jsx
+   │  ├─ Memberships.jsx
+   │  ├─ Merchandise.jsx
+   │  ├─ MerchandiseSales.jsx
+   │  ├─ Payments.jsx
+   │  ├─ Promotions.jsx
+   │  └─ Users.jsx
+   └─ services/
+      ├─ attendanceService.js
+      ├─ authService.js
+      ├─ creditService.js
+      ├─ membershipsService.js
+      ├─ membersService.js
+      ├─ paymentsService.js
+      ├─ productsService.js
+      ├─ promotionsService.js
+      └─ salesService.js
+
+Resumen mental
+
+Frontend Vite + React + Tailwind
+
+main.jsx → punto de entrada
+
+App.jsx → control de sesión y navegación
+
+pages/ → vistas del sistema
+
+services/ → comunicación con backend
+
+UI mínima reutilizable (Sidebar, MainLayout)
+
+Assets reales del proyecto (logo Kronnos)
+
+🧠 Arquitectura grabada (modelo mental final)
+Electron (electron/main.js)
+        ↓
+Renderer (Vite + React)
+        ↓
+Services (fetch / axios)
+        ↓
+Kronnos-backend (Express)
+        ↓
+MySQL
+
+
+✅ Confirmación final
+
+Ahora tengo la estructura exacta
+
+No volveré a mencionar archivos que no existen
+
+Cualquier ayuda futura será archivo + ruta precisa
+

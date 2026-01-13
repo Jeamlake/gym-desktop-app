@@ -17,6 +17,7 @@ const MENU = [
       { label: "Usuarios", route: "users", roles: ["ADMIN"] },
       { label: "Promociones", route: "promotions", roles: ["ADMIN"] },
       { label: "Reportes", route: "reports", roles: ["ADMIN"] },
+      { label: "Mercadería", route: "merchandise", roles: ["ADMIN"] },
       // más adelante: Inventario, Productos, Ventas...
     ],
   },
@@ -31,8 +32,13 @@ const MENU = [
         roles: ["ADMIN", "RECEPCION"],
       },
       {
-        label: "Asistencia",
-        route: "attendance",
+        label: "Venta de Mercadería",
+        route: "merchandise-sales",
+        roles: ["ADMIN", "RECEPCION"],
+      },
+      {
+        label: "Créditos",
+        route: "credits",
         roles: ["ADMIN", "RECEPCION"],
       },
     ],

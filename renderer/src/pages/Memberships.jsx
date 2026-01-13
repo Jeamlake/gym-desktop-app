@@ -9,6 +9,13 @@ import { getMembers } from "../services/membersService";
 import { getPromotions } from "../services/promotionsService";
 import { getAvailablePayments } from "../services/paymentsService";
 import MembershipHistoryCalendar from "../components/MembershipHistoryCalendar";
+import AttendanceCalendar from "../components/AttendanceCalendar";
+import {
+  getAttendanceByMember,
+  scanAttendance,
+  markAttendanceManual,
+} from "../services/attendanceService";
+
  
 
 export default function Memberships() {
@@ -25,7 +32,14 @@ export default function Memberships() {
   const [historyOpen, setHistoryOpen] = useState(false);
   const [historyMember, setHistoryMember] = useState(null);
   const [history, setHistory] = useState([]);
-  const [historyView, setHistoryView] = useState("list"); // "list" | "calendar"
+  const [attendance, setAttendance] = useState([]);
+  const [activeTab, setActiveTab] = useState("memberships");
+  // "memberships" | "attendance"
+
+  const [membershipView, setMembershipView] = useState("list");
+  // "list" | "calendar"
+
+  const [confirmDate, setConfirmDate] = useState(null);
 
   const [form, setForm] = useState({
     member_id: "",
@@ -125,8 +139,13 @@ export default function Memberships() {
       setLoading(true);
       setHistoryMember(member);
 
-      const data = await getMembershipHistory(member.member_id);
-      setHistory(data);
+      const [historyData, attendanceData] = await Promise.all([
+        getMembershipHistory(member.member_id),
+        getAttendanceByMember(member.member_id),
+      ]);
+
+      setHistory(historyData);
+      setAttendance(attendanceData);
       setHistoryOpen(true);
     } catch (err) {
       setError(err.message);
@@ -197,7 +216,6 @@ export default function Memberships() {
       estado: h.estado,
     },
   }));
-
 
   return (
     <div className="space-y-6">
@@ -433,24 +451,46 @@ export default function Memberships() {
                 Historial de Membresías
               </h3>
 
-              <div className="flex gap-2">
-                <button
-                  className="btn-secondary text-xs"
-                  onClick={() =>
-                    setHistoryView(historyView === "list" ? "calendar" : "list")
-                  }
-                >
-                  {historyView === "list"
-                    ? "📅 Cambiar a vista calendario"
-                    : "📄 Cambiar a vista listado"}
-                </button>
+              <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                {/* TABS */}
+                <div className="flex gap-4">
+                  <button
+                    onClick={() => setActiveTab("memberships")}
+                    className={`text-sm font-semibold pb-1 ${
+                      activeTab === "memberships"
+                        ? "text-kronnos-gold border-b-2 border-kronnos-gold"
+                        : "text-gray-400 hover:text-white"
+                    }`}
+                  >
+                    Membresías
+                  </button>
 
-                <button
-                  className="text-gray-400 hover:text-white"
-                  onClick={() => setHistoryOpen(false)}
-                >
-                  ✕
-                </button>
+                  <button
+                    onClick={() => setActiveTab("attendance")}
+                    className={`text-sm font-semibold pb-1 ${
+                      activeTab === "attendance"
+                        ? "text-green-400 border-b-2 border-green-400"
+                        : "text-gray-400 hover:text-white"
+                    }`}
+                  >
+                    Asistencia
+                  </button>
+                </div>
+
+                {/* CERRAR */}
+                <div className="ml-6">
+                  <button
+                    className="text-gray-400 hover:text-white text-lg"
+                    onClick={() => {
+                      setHistoryOpen(false);
+                      setConfirmDate(null);
+                      setActiveTab("memberships");
+                      setMembershipView("list");
+                    }}
+                  >
+                    ✕
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -459,43 +499,114 @@ export default function Memberships() {
               {historyMember?.dni}
             </p>
 
-            {historyView === "list" ? (
-              <div className="space-y-3">
-                {history.map((h) => (
-                  <div
-                    key={h.id}
-                    className="border-l-4 pl-4 py-2 rounded border-kronnos-gold bg-white/5"
-                  >
-                    <div className="flex justify-between items-center">
-                      <span className="font-semibold text-sm">
-                        {h.promocion}
-                      </span>
-
-                      <span
-                        className={`text-xs font-bold px-2 py-1 rounded ${
-                          h.evento === "CREACION"
-                            ? "bg-blue-500/20 text-blue-400"
-                            : "bg-purple-500/20 text-purple-400"
-                        }`}
-                      >
-                        {h.evento === "CREACION" ? "Creada" : "Renovada"}
-                      </span>
-                    </div>
-
-                    <p className="text-sm mt-1">
-                      📅 {new Date(h.fecha_inicio).toLocaleDateString()} →{" "}
-                      {new Date(h.fecha_fin).toLocaleDateString()}
-                    </p>
-
-                    <p className="text-xs text-gray-400">
-                      💰 S/ {h.monto} – {h.metodo}
-                    </p>
-                  </div>
-                ))}
-              </div>
+            {activeTab === "attendance" ? (
+              <AttendanceCalendar
+                attendance={attendance}
+                memberships={history}
+                onManualMark={(date) => setConfirmDate(date)}
+              />
             ) : (
-              <MembershipHistoryCalendar history={history} />
+              <>
+                {/* SUB-VISTA DE MEMBRESÍAS */}
+                <div className="flex justify-end mb-3">
+                  <button
+                    className="btn-secondary text-xs"
+                    onClick={() =>
+                      setMembershipView(
+                        membershipView === "list" ? "calendar" : "list"
+                      )
+                    }
+                  >
+                    {membershipView === "list"
+                      ? "📅 Ver calendario"
+                      : "📄 Ver listado"}
+                  </button>
+                </div>
+
+                {membershipView === "list" ? (
+                  <div className="space-y-3">
+                    {history.map((h) => (
+                      <div
+                        key={h.id}
+                        className="border-l-4 pl-4 py-2 rounded border-kronnos-gold bg-white/5"
+                      >
+                        <div className="flex justify-between items-center">
+                          <span className="font-semibold text-sm">
+                            {h.promocion}
+                          </span>
+
+                          <span
+                            className={`text-xs font-bold px-2 py-1 rounded ${
+                              h.evento === "CREACION"
+                                ? "bg-blue-500/20 text-blue-400"
+                                : "bg-purple-500/20 text-purple-400"
+                            }`}
+                          >
+                            {h.evento === "CREACION" ? "Creada" : "Renovada"}
+                          </span>
+                        </div>
+
+                        <p className="text-sm mt-1">
+                          📅 {new Date(h.fecha_inicio).toLocaleDateString()} →{" "}
+                          {new Date(h.fecha_fin).toLocaleDateString()}
+                        </p>
+
+                        <p className="text-xs text-gray-400">
+                          💰 S/ {h.monto} – {h.metodo}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <MembershipHistoryCalendar history={history} />
+                )}
+              </>
             )}
+          </div>
+        </div>
+      )}
+
+      {confirmDate && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-gray-900 rounded-lg p-6 w-80 space-y-4">
+            <h3 className="text-lg font-bold text-kronnos-gold">
+              ¿Marcar asistencia?
+            </h3>
+
+            <p className="text-sm text-gray-400">
+              Fecha: {new Date(confirmDate).toLocaleDateString("es-PE")}
+            </p>
+
+            <div className="flex justify-end gap-3">
+              <button
+                className="btn-secondary"
+                onClick={() => setConfirmDate(null)}
+              >
+                No
+              </button>
+
+              <button
+                className="btn-primary"
+                onClick={async () => {
+                  try {
+                    await markAttendanceManual({
+                      member_id: historyMember.member_id,
+                      date: confirmDate,
+                    });
+
+                    const updated = await getAttendanceByMember(
+                      historyMember.member_id
+                    );
+                    setAttendance(updated);
+                    setConfirmDate(null);
+                  } catch (e) {
+                    setError(e.message);
+                  }
+                }}
+              >
+                Sí
+              </button>
+            </div>
           </div>
         </div>
       )}

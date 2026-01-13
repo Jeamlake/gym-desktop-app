@@ -7,8 +7,14 @@ import MainLayout from "./layouts/MainLayout";
 import Promotions from "./pages/Promotions";
 import Memberships from "./pages/Memberships";
 import Payments from "./pages/Payments";
-import Attendance from "./pages/Attendance";
 import Members from "./pages/Members";
+import Merchandise from "./pages/Merchandise";
+import MerchandiseSales from "./pages/MerchandiseSales";
+import MemberCredit from "./pages/MemberCredit";
+
+
+
+
 
 const PagePlaceholder = ({ title }) => (
   <div className="text-gray-300">
@@ -66,10 +72,20 @@ function App() {
         roles: ["ADMIN", "RECEPCION"],
         element: <Payments />,
       },
-      attendance: {
-        title: "Asistencia",
+      merchandise: {
+        title: "Mercadería",
+        roles: ["ADMIN"],
+        element: <Merchandise />,
+      },
+      "merchandise-sales": {
+        title: "Venta de Mercadería",
         roles: ["ADMIN", "RECEPCION"],
-        element: <Attendance />,
+        element: <MerchandiseSales />,
+      },
+      credits: {
+        title: "Crédito del Socio",
+        roles: ["ADMIN", "RECEPCION"],
+        element: <MemberCredit />,
       },
       "trainer-members": {
         title: "Mis Socios",
@@ -112,7 +128,7 @@ function App() {
         <div className="text-red-500 font-semibold">Acceso denegado</div>
       )}
     </MainLayout>
-  );
+  );  
 }
 
 export default App;

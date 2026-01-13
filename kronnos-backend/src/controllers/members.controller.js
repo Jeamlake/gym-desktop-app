@@ -1,11 +1,11 @@
-import { pool } from "../config/db.js";
+import db from "../config/db.js";
 
 /**
  * GET /api/members
  */
 export const getMembers = async (req, res) => {
   try {
-    const [rows] = await pool.query(`
+    const [rows] = await db.query(`
       SELECT 
         id,
         nombres,
@@ -58,10 +58,9 @@ export const createMember = async (req, res) => {
 
   try {
     // 🔍 Validar DNI único
-    const [existing] = await pool.query(
-      "SELECT id FROM members WHERE dni = ?",
-      [dni]
-    );
+    const [existing] = await db.query("SELECT id FROM members WHERE dni = ?", [
+      dni,
+    ]);
 
     if (existing.length > 0) {
       return res.status(409).json({
@@ -70,7 +69,7 @@ export const createMember = async (req, res) => {
     }
 
     // 💾 Insertar socio
-    const [result] = await pool.query(
+    const [result] = await db.query(
       `
       INSERT INTO members
       (nombres, apellidos, dni, direccion, celular, fecha_nacimiento, created_by)

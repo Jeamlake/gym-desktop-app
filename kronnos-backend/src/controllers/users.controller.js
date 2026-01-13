@@ -1,14 +1,13 @@
 import bcrypt from "bcrypt";
-import { pool } from "../config/db.js";
+import db from "../config/db.js";
 import crypto from "crypto";
-
 
 /**
  * GET /api/users
  */
 export const getUsers = async (req, res) => {
   try {
-    const [rows] = await pool.query(
+    const [rows] = await db.query(
       "SELECT id, username, email, role FROM users WHERE active = 1"
     );
     res.json(rows);
@@ -37,7 +36,7 @@ export const createUser = async (req, res) => {
 
     const hash = await bcrypt.hash(password, 10);
 
-    await pool.query(
+    await db.query(
       "INSERT INTO users (username, email, password_hash, role) VALUES (?, ?, ?, ?)",
       [name, email, hash, role]
     );
@@ -65,7 +64,7 @@ export const updateUser = async (req, res) => {
 
     const { name, email } = req.body;
 
-    await pool.query("UPDATE users SET username = ?, email = ? WHERE id = ?", [
+    await db.query("UPDATE users SET username = ?, email = ? WHERE id = ?", [
       name,
       email,
       targetId,
@@ -103,10 +102,7 @@ export const updateUserRole = async (req, res) => {
       });
     }
 
-    await pool.query("UPDATE users SET role = ? WHERE id = ?", [
-      role,
-      targetId,
-    ]);
+    await db.query("UPDATE users SET role = ? WHERE id = ?", [role, targetId]);
 
     res.json({ message: "Rol actualizado" });
   } catch (error) {
@@ -114,7 +110,6 @@ export const updateUserRole = async (req, res) => {
     res.status(500).json({ message: "Error al cambiar rol" });
   }
 };
-
 
 export const resetPassword = async (req, res) => {
   try {
@@ -131,7 +126,7 @@ export const resetPassword = async (req, res) => {
     const tempPassword = crypto.randomBytes(4).toString("hex"); // ej: a3f9c2e1
     const hash = await bcrypt.hash(tempPassword, 10);
 
-    await pool.query(
+    await db.query(
       `
       UPDATE users
       SET password_hash = ?, must_change_password = 1
@@ -156,12 +151,15 @@ export const changePassword = async (req, res) => {
     const { password } = req.body;
 
     if (!password || password.length < 6) {
-      return res.status(400).json({ message: "Contraseña inválida ya que tiene que tener mas de 6 caracteres" });
+      return res.status(400).json({
+        message:
+          "Contraseña inválida ya que tiene que tener mas de 6 caracteres",
+      });
     }
 
     const hash = await bcrypt.hash(password, 10);
 
-    await pool.query(
+    await db.query(
       "UPDATE users SET password_hash = ?, must_change_password = 0 WHERE id = ?",
       [hash, req.user.id]
     );
@@ -172,4 +170,3 @@ export const changePassword = async (req, res) => {
     res.status(500).json({ message: "Error al cambiar contraseña" });
   }
 };
-

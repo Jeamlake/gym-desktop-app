@@ -34,7 +34,7 @@ CREATE TABLE `attendance` (
   KEY `fk_attendance_user` (`recorded_by`),
   CONSTRAINT `fk_attendance_member` FOREIGN KEY (`member_id`) REFERENCES `members` (`id`),
   CONSTRAINT `fk_attendance_user` FOREIGN KEY (`recorded_by`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -43,8 +43,136 @@ CREATE TABLE `attendance` (
 
 LOCK TABLES `attendance` WRITE;
 /*!40000 ALTER TABLE `attendance` DISABLE KEYS */;
-INSERT INTO `attendance` VALUES (1,2,'2026-01-05',1,1,'2026-01-05 18:14:41');
+INSERT INTO `attendance` VALUES (1,2,'2026-01-05',1,1,'2026-01-05 18:14:41'),(2,2,'2026-02-27',1,1,'2026-01-08 00:49:30'),(3,1,'2026-01-03',1,1,'2026-01-08 13:28:52'),(5,1,'2026-01-15',1,1,'2026-01-08 15:31:43'),(6,1,'2026-01-16',1,1,'2026-01-08 16:03:56'),(7,2,'2026-02-19',1,1,'2026-01-08 16:04:08'),(8,2,'2026-01-08',1,1,'2026-01-08 18:02:47'),(9,2,'2026-01-07',1,1,'2026-01-08 18:02:50'),(10,2,'2026-01-15',1,1,'2026-01-08 21:07:34'),(11,2,'2026-01-09',1,1,'2026-01-12 23:26:12');
 /*!40000 ALTER TABLE `attendance` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `attendance_logs`
+--
+
+DROP TABLE IF EXISTS `attendance_logs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `attendance_logs` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `member_id` int NOT NULL,
+  `membership_id` int NOT NULL,
+  `action` enum('IN','OUT') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `scanned_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_by` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_member_date` (`member_id`,`scanned_at`),
+  KEY `fk_att_log_membership` (`membership_id`),
+  KEY `fk_att_log_user` (`created_by`),
+  CONSTRAINT `fk_att_log_member` FOREIGN KEY (`member_id`) REFERENCES `members` (`id`),
+  CONSTRAINT `fk_att_log_membership` FOREIGN KEY (`membership_id`) REFERENCES `memberships` (`id`),
+  CONSTRAINT `fk_att_log_user` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `attendance_logs`
+--
+
+LOCK TABLES `attendance_logs` WRITE;
+/*!40000 ALTER TABLE `attendance_logs` DISABLE KEYS */;
+INSERT INTO `attendance_logs` VALUES (1,2,3,'IN','2026-02-27 00:00:00',1),(2,1,1,'IN','2026-01-03 00:00:00',1),(3,1,1,'IN','2026-01-03 00:00:00',1),(4,1,1,'IN','2026-01-15 00:00:00',1),(5,1,1,'IN','2026-01-16 00:00:00',1),(6,2,3,'IN','2026-02-19 00:00:00',1),(7,2,2,'IN','2026-01-08 00:00:00',1),(8,2,2,'IN','2026-01-07 00:00:00',1),(9,2,2,'IN','2026-01-15 00:00:00',1),(10,2,2,'IN','2026-01-09 12:00:00',1);
+/*!40000 ALTER TABLE `attendance_logs` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `credit_accounts`
+--
+
+DROP TABLE IF EXISTS `credit_accounts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `credit_accounts` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `member_id` int NOT NULL,
+  `saldo` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `active` tinyint(1) DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `credit_limit` decimal(10,2) DEFAULT '0.00',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `member_id` (`member_id`),
+  CONSTRAINT `fk_credit_accounts_member` FOREIGN KEY (`member_id`) REFERENCES `members` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `credit_accounts`
+--
+
+LOCK TABLES `credit_accounts` WRITE;
+/*!40000 ALTER TABLE `credit_accounts` DISABLE KEYS */;
+INSERT INTO `credit_accounts` VALUES (1,2,2.50,1,'2026-01-12 22:17:59',0.00);
+/*!40000 ALTER TABLE `credit_accounts` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `credit_items`
+--
+
+DROP TABLE IF EXISTS `credit_items`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `credit_items` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `credit_movement_id` int NOT NULL,
+  `product_id` int NOT NULL,
+  `cantidad` int NOT NULL,
+  `precio_unitario` decimal(10,2) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_credit_items_movement` (`credit_movement_id`),
+  KEY `idx_credit_items_product` (`product_id`),
+  CONSTRAINT `fk_credit_items_movement` FOREIGN KEY (`credit_movement_id`) REFERENCES `credit_movements` (`id`),
+  CONSTRAINT `fk_credit_items_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `credit_items`
+--
+
+LOCK TABLES `credit_items` WRITE;
+/*!40000 ALTER TABLE `credit_items` DISABLE KEYS */;
+INSERT INTO `credit_items` VALUES (1,1,2,1,2.50);
+/*!40000 ALTER TABLE `credit_items` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `credit_movements`
+--
+
+DROP TABLE IF EXISTS `credit_movements`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `credit_movements` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `member_id` int NOT NULL,
+  `tipo` enum('CARGO','PAGO') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `monto` decimal(10,2) NOT NULL,
+  `motivo` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_by` int DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `fk_credit_movements_user` (`created_by`),
+  KEY `idx_credit_mov_member` (`member_id`),
+  CONSTRAINT `fk_credit_movements_member` FOREIGN KEY (`member_id`) REFERENCES `members` (`id`),
+  CONSTRAINT `fk_credit_movements_user` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `credit_movements`
+--
+
+LOCK TABLES `credit_movements` WRITE;
+/*!40000 ALTER TABLE `credit_movements` DISABLE KEYS */;
+INSERT INTO `credit_movements` VALUES (1,2,'CARGO',2.50,'FIADO DE MERCADERÍA',1,'2026-01-12 22:17:59');
+/*!40000 ALTER TABLE `credit_movements` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -67,7 +195,7 @@ CREATE TABLE `inventory_movements` (
   KEY `fk_inventory_user` (`created_by`),
   CONSTRAINT `fk_inventory_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`),
   CONSTRAINT `fk_inventory_user` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -76,6 +204,7 @@ CREATE TABLE `inventory_movements` (
 
 LOCK TABLES `inventory_movements` WRITE;
 /*!40000 ALTER TABLE `inventory_movements` DISABLE KEYS */;
+INSERT INTO `inventory_movements` VALUES (1,1,'IN',132,'COMPRA',1,'2026-01-12 16:40:01'),(2,2,'IN',30,'COMPRA',1,'2026-01-12 16:44:43'),(3,2,'IN',40,'COMPRA',1,'2026-01-12 16:45:02'),(4,3,'IN',40,'COMPRA',1,'2026-01-12 16:45:07'),(5,2,'OUT',3,'VENTA',1,'2026-01-12 17:00:17'),(6,1,'OUT',2,'VENTA',1,'2026-01-12 17:00:21'),(7,3,'OUT',2,'VENTA',1,'2026-01-12 17:00:21'),(8,3,'OUT',2,'VENTA',1,'2026-01-12 17:00:24'),(9,2,'OUT',2,'VENTA',1,'2026-01-12 17:00:24'),(10,1,'OUT',1,'VENTA',1,'2026-01-12 18:53:49'),(11,3,'OUT',1,'VENTA',1,'2026-01-12 22:18:21');
 /*!40000 ALTER TABLE `inventory_movements` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -149,7 +278,7 @@ CREATE TABLE `memberships` (
 
 LOCK TABLES `memberships` WRITE;
 /*!40000 ALTER TABLE `memberships` DISABLE KEYS */;
-INSERT INTO `memberships` VALUES (1,1,1,1,'2026-01-02','2026-01-31','ACTIVA',1,'2026-01-02 16:11:26','CREACION'),(2,2,1,2,'2026-01-06','2026-02-04','VENCIDA',1,'2026-01-05 03:20:53','CREACION'),(3,2,1,3,'2026-02-04','2026-03-05','ACTIVA',1,'2026-01-05 03:22:58','RENOVACION');
+INSERT INTO `memberships` VALUES (1,1,1,1,'2026-01-02','2026-01-31','ACTIVA',1,'2026-01-02 16:11:26','CREACION'),(2,2,1,2,'2026-01-06','2026-02-04','ACTIVA',1,'2026-01-05 03:20:53','CREACION'),(3,2,1,3,'2026-02-04','2026-03-05','ACTIVA',1,'2026-01-05 03:22:58','RENOVACION');
 /*!40000 ALTER TABLE `memberships` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -235,7 +364,7 @@ CREATE TABLE `products` (
   `active` tinyint(1) DEFAULT '1',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -244,6 +373,7 @@ CREATE TABLE `products` (
 
 LOCK TABLES `products` WRITE;
 /*!40000 ALTER TABLE `products` DISABLE KEYS */;
+INSERT INTO `products` VALUES (1,'Agua 1/2L','Bebidas',1.50,1.00,129,1,'2026-01-12 16:25:40'),(2,'Volt 700ml','Bebida Energetica',2.50,1.50,64,1,'2026-01-12 16:44:35'),(3,'Suerox','Bebida Energetica',4.00,2.00,35,1,'2026-01-12 16:44:57');
 /*!40000 ALTER TABLE `products` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -296,7 +426,7 @@ CREATE TABLE `sale_items` (
   KEY `fk_sale_item_product` (`product_id`),
   CONSTRAINT `fk_sale_item_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`),
   CONSTRAINT `fk_sale_item_sale` FOREIGN KEY (`sale_id`) REFERENCES `sales` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -305,6 +435,7 @@ CREATE TABLE `sale_items` (
 
 LOCK TABLES `sale_items` WRITE;
 /*!40000 ALTER TABLE `sale_items` DISABLE KEYS */;
+INSERT INTO `sale_items` VALUES (1,1,2,3,2.50),(2,2,1,2,1.50),(3,2,3,2,4.00),(4,3,3,2,4.00),(5,3,2,2,2.50),(6,4,1,1,1.50),(7,5,3,1,4.00);
 /*!40000 ALTER TABLE `sale_items` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -320,10 +451,11 @@ CREATE TABLE `sales` (
   `sold_by` int NOT NULL,
   `total` decimal(10,2) NOT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `metodo_pago` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'EFECTIVO',
   PRIMARY KEY (`id`),
   KEY `fk_sales_user` (`sold_by`),
   CONSTRAINT `fk_sales_user` FOREIGN KEY (`sold_by`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -332,6 +464,7 @@ CREATE TABLE `sales` (
 
 LOCK TABLES `sales` WRITE;
 /*!40000 ALTER TABLE `sales` DISABLE KEYS */;
+INSERT INTO `sales` VALUES (1,1,7.50,'2026-01-12 17:00:17','EFECTIVO'),(2,1,11.00,'2026-01-12 17:00:21','EFECTIVO'),(3,1,13.00,'2026-01-12 17:00:24','EFECTIVO'),(4,1,1.50,'2026-01-12 18:53:49','EFECTIVO'),(5,1,4.00,'2026-01-12 22:18:21','PLIN');
 /*!40000 ALTER TABLE `sales` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -441,4 +574,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-01-07  9:29:17
+-- Dump completed on 2026-01-12 20:14:01

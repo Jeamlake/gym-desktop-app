@@ -1,12 +1,12 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { pool } from "../config/db.js";
+import db from "../config/db.js";
 
 export const login = async (req, res) => {
   const { identifier, password, role } = req.body;
 
   try {
-    const [rows] = await pool.query(
+    const [rows] = await db.query(
       "SELECT * FROM users WHERE (username = ? OR email = ?) AND role = ? AND active = 1",
       [identifier, identifier, role]
     );
@@ -41,7 +41,6 @@ export const login = async (req, res) => {
         mustChangePassword: user.must_change_password === 1,
       },
     });
-
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error interno del servidor" });

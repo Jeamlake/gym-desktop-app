@@ -1,8 +1,8 @@
-import { pool } from "../config/db.js";
+import db from "../config/db.js";
 
 export const expireMemberships = async () => {
   try {
-    await pool.query(`
+    await db.query(`
       UPDATE memberships
       SET estado = 'VENCIDA'
       WHERE fecha_fin < CURDATE()

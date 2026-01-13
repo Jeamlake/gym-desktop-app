@@ -160,7 +160,7 @@ export const getAvailablePayments = async (req, res) => {
   }
 
   try {
-    const [rows] = await pool.query(
+    const [rows] = await db.query(
       `
       SELECT p.id, p.monto, p.metodo, p.periodo, p.created_at
       FROM payments p
@@ -180,4 +180,3 @@ export const getAvailablePayments = async (req, res) => {
     });
   }
 };
-

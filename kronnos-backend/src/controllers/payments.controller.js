@@ -1,11 +1,11 @@
-import { pool } from "../config/db.js";
+import db from "../config/db.js";
 
 export const createPayment = async (req, res) => {
   const { member_id, monto, metodo, periodo } = req.body;
   const userId = req.user.id;
 
   try {
-    await pool.query(
+    await db.query(
       `INSERT INTO payments
        (member_id, monto, metodo, periodo, created_by)
        VALUES (?, ?, ?, ?, ?)`,
@@ -23,7 +23,7 @@ export const createPayment = async (req, res) => {
 
 export const getPayments = async (req, res) => {
   try {
-    const [rows] = await pool.query(`
+    const [rows] = await db.query(`
       SELECT p.id,
              m.nombres,
              m.apellidos,
@@ -52,7 +52,7 @@ export const getAvailablePayments = async (req, res) => {
   }
 
   try {
-    const [rows] = await pool.query(
+    const [rows] = await db.query(
       `
       SELECT p.id,
              p.monto,
